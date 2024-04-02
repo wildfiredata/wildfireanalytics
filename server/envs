@@ -1,0 +1,45 @@
+# centos: https://mirrors.163.com/centos/7.9.2009/isos/x86_64/CentOS-7-x86_64-DVD-2009.iso
+
+LICENSE_CODE = himeta
+# 数据库名字
+CK_DATABASE = default
+CK_PWD = 
+MYSQL_DATABASE = default
+DB_PWD = demopwd
+
+# 制品位置
+IMAGE_BASE = registry.cn-hangzhou.aliyuncs.com/himeta
+
+# 服务端口分配表【统一表】
+geo_grpc = 7380
+oneuser_grpc = 7381
+saver_http = 8382
+saver_grpc = 7382
+configurator_http = 8383
+configurator_grpc = 7383
+idnew_http = 8384
+idnew_grpc = 7384
+portal_http = 8385
+portal_grpc = 7385
+reporter_http = 8386
+reporter_grpc = 7386
+notifer_http = 8387
+notifer_grpc = 7387
+apigate_http = 8388
+apigate_grpc = 7388
+trackgate_http = 8390
+trackgate_grpc = 7390
+msgx_http1 = 8410
+msgx_http2 = 8411
+msgx_grpc = 7410
+msgx_tport = 6410
+
+# 文件夹
+mysql_dir = /data/mysql
+kafka_dir = /data/kafka
+redis_dir = /data/redis
+clickhouse_dir = /data/clickhouse
+backup_dir = /backdisk
+
+# 数据服务(data)所在IP地址
+HOST_IP = 192.168.3.25

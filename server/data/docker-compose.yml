@@ -1,0 +1,81 @@
+# 所有服务端口 从28080以上开始
+# 28080,25502 作为NGINX 外部代理商品
+# 25500 websocket是直接
+version: '2'
+services:
+  zookeeper:
+    image: zookeeper:3.7.0
+    restart: always
+    hostname: zookeeper
+    ports:
+      - 2181:2181
+    environment:
+      ALLOW_ANONYMOUS_LOGIN: 1
+    security_opt:
+      - label:disable
+  
+  clickhouse:
+    container_name: clickhouse
+    image: clickhouse/clickhouse-server:22.9.6
+    ports:
+      - 18123:8123
+      - 19000:9000
+      - 19009:9009
+    volumes:
+      - ${clickhouse_dir}/cktools:/cktools:rslave"
+      - ${clickhouse_dir}/ck_log:/var/log/clickhouse-server
+      - ${clickhouse_dir}/ck_data:/var/lib/clickhouse
+    ulimits:
+      nproc: 65535
+      nofile:
+        soft: 262144
+        hard: 262144
+    privileged: true
+    depends_on:
+      - zookeeper
+
+  redis:
+    container_name: redis
+    image: redis:5.0.0
+    command: redis-server --requirepass ${DB_PWD}
+    ports:
+      - 16379:6379
+    volumes:
+      - ${redis_dir}/data:/data
+
+  mysql:
+    container_name: mysql
+    image: mysql:8
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_PWD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+    command:
+      --character-set-server=utf8mb4
+      --collation-server=utf8mb4_general_ci
+      --default-authentication-plugin=mysql_native_password
+    ports:
+      - 13306:3306
+    volumes:
+      - ${mysql_dir}/mytools:/mytools
+      - ${mysql_dir}/data:/var/lib/mysql
+      - ${mysql_dir}/conf:/etc/mysql/conf.d
+    privileged: true    
+
+  kafka:
+    container_name: kafka
+    image: wurstmeister/kafka
+    ports:
+      - 19092:9092
+    environment:
+      # 外网IP https://github.com/wurstmeister/kafka-docker/wiki/Connectivity
+      KAFKA_ADVERTISED_HOST_NAME: ${HOST_IP}
+      # 和PORTS映射对齐
+      KAFKA_ADVERTISED_PORT: 19092
+      KAFKA_MESSAGE_MAX_BYTES: 40960000
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      # KAFKA_AUTO_CREATE_TOPICS_ENABLE: true
+    volumes:
+      - ${kafka_dir}:/kafka
+      # - /var/run/docker.sock:/var/run/docker.sock
+    privileged: true    

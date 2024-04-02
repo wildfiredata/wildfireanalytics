@@ -1,0 +1,1 @@
+"use strict";(self["webpackChunkwildfire"]=self["webpackChunkwildfire"]||[]).push([[64],{20064:function(n,e,t){t.r(e),t.d(e,{default:function(){return a}});var u=function(){var n=this,e=n._self._c;return e("div")},l=[],r={components:{},data(){return{val:""}},methods:{}},i=r,s=t(1001),f=(0,s.Z)(i,u,l,!1,null,null,null),a=f.exports}}]);

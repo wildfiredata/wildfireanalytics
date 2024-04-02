@@ -1,0 +1,259 @@
+# 所有服务端口 从28080以上开始
+# 28080,25502 作为NGINX 外部代理商品
+# 25500 websocket是直接
+version: '2'
+services:
+  syncuser:
+    image: ${IMAGE_BASE}/syncuser:1.1.0
+    restart: always
+    hostname: syncuser
+    container_name: syncuser
+    environment:
+      Name: syncuser
+      Tables: users
+      Install: ${INSTALL_SYSTEM}
+      UpdateTimeFields: update_time
+      IdFields: user_id
+      DbLogLevel: debug
+      DbType: mysql
+      DbDsn: root:${DB_PWD}@tcp(${HOST_IP}:13306)/${MYSQL_DATABASE}?charset=utf8mb4&parseTime=True
+      GormCkDsn: tcp://${HOST_IP}:19000?database=${CK_DATABASE}&password=${CK_PWD}&read_timeout=10&write_timeout=30
+      TaskInterval: 600
+      LogLevel: debug
+      SvcNotifer: notifer:${notifer_grpc}
+    depends_on:
+      - notifer
+      
+  oneuser:
+    image: ${IMAGE_BASE}/oneuser:1.1.0
+    restart: always
+    hostname: oneuser
+    container_name: oneuser
+    ports:
+      - ${oneuser_grpc}:${oneuser_grpc}
+    environment:
+      Name: oneuser
+      GrpcListen: :${oneuser_grpc}
+      RedisAddr: ${HOST_IP}:16379
+      RedisPassword: ${DB_PWD}
+      DbType: mysql
+      DbDsn: root:${DB_PWD}@tcp(${HOST_IP}:13306)/${MYSQL_DATABASE}?charset=utf8mb4&parseTime=True
+      DbLogLevel: debug
+      LogLevel: debug
+      UseridTtl: 360
+      SvcNotifer: notifer:${notifer_grpc}
+      SvcIdnew: idnew:${idnew_grpc}
+    depends_on:
+      - notifer
+      - idnew
+      
+  saver:
+    image: ${IMAGE_BASE}/saver:1.1.0
+    restart: always
+    hostname: saver
+    container_name: saver
+    ports:
+      - ${saver_http}:${saver_http}
+      - ${saver_grpc}:${saver_grpc}
+    environment:
+      HttpListen: :${saver_http}
+      GrpcListen: :${saver_grpc}
+      CkDebug: false
+      Install: ${INSTALL_SYSTEM}
+      WorkerCacheExpire: 36000
+      CounterInterval: 30
+      LogLevel: info
+      DbLogLevel: warn 
+      EventSaveBatch: 10000
+      EventSaveInterval: 360
+      DbType: mysql
+      DbDsn: root:${DB_PWD}@tcp(${HOST_IP}:13306)/${MYSQL_DATABASE}?charset=utf8mb4&parseTime=True
+      UserIntervalHigh: 300
+      UserIntervalLow: 120
+      UserBatchLimit: 500
+      CkAddr: ${HOST_IP}:19000
+      CkDataBase: ${CK_DATABASE}
+      CkUser: default
+      CkPassword: ${CK_PWD}
+      EventPullerNum: 3
+      UseropPullerNum: 1
+      UserPcu: 100000
+      KafkaBrokers: ${HOST_IP}:19092
+      ConsumerGroupId: dbsaver
+      EventStartTs: 1662900901
+      EventTrackTopic: track_event
+      UseropTrackTopic: track_userop2
+      SvcIdnew: idnew:${idnew_grpc}
+      SvcConfigurator: configurator:${configurator_grpc}
+      SvcNotifer: notifer:${notifer_grpc}
+      Name: saver
+      CookieKey: galaxyok0910
+      SvcOneuser: oneuser:${oneuser_grpc}
+      UuidExpire: 3600
+    depends_on:
+      - notifer
+      - idnew
+      - configurator
+      - oneuser
+
+  configurator:
+    image: ${IMAGE_BASE}/configurator:1.1.0
+    restart: always
+    hostname: configurator
+    container_name: configurator
+    ports:
+      - ${configurator_http}:${configurator_http}
+      - ${configurator_grpc}:${configurator_grpc}
+    environment:
+      Name: configurator
+      GrpcListen: :${configurator_grpc}
+      HttpListen: :${configurator_http}
+      LogLevel: debug
+      DbType: mysql
+      DbDsn: root:${DB_PWD}@tcp(${HOST_IP}:13306)/${MYSQL_DATABASE}?charset=utf8mb4&parseTime=True
+      DbLogLevel: debug
+      CookieKey: galaxyok0910
+      SvcNotifer: notifer:${notifer_grpc}
+    depends_on:
+      - notifer
+      
+  idnew:
+    image: ${IMAGE_BASE}/idnew:1.1.0
+    restart: always
+    hostname: idnew
+    container_name: idnew
+    ports:
+      - ${idnew_http}:${idnew_http}
+      - ${idnew_grpc}:${idnew_grpc}
+    environment:
+      Name: idnew
+      HttpListen: :${idnew_http}
+      GrpcListen: :${idnew_grpc}
+
+  portal:
+    image: ${IMAGE_BASE}/portal:1.1.0
+    restart: always
+    hostname: portal
+    container_name: portal
+    ports:
+      - ${portal_http}:${portal_http}
+      - ${portal_grpc}:${portal_grpc}
+    environment:
+      Name: portal
+      Listen: :${portal_http}
+      GrpcListen: :${portal_grpc}
+      Dsn: root:${DB_PWD}@tcp(${HOST_IP}:13306)/${MYSQL_DATABASE}?charset=utf8mb4&parseTime=True
+      DbType: mysql
+      LogLevel: debug
+      DbLogLevel: debug
+      JwtTimeoutSecond: 864000000
+      CookieKey: galaxyok0910
+      SvcNotifer: notifer:${notifer_grpc}
+    depends_on:
+      - notifer
+
+  reporter:
+    image: ${IMAGE_BASE}/reporter:1.1.0
+    restart: always
+    hostname: reporter
+    container_name: reporter
+    ports:
+      - ${reporter_http}:${reporter_http}
+      - ${reporter_grpc}:${reporter_grpc}
+    environment:
+      Name: reporter
+      HttpListen: :${reporter_http}
+      GrpcListen: :${reporter_grpc}
+      Install: ${INSTALL_SYSTEM}      
+      DbType: mysql
+      DbDsn: root:${DB_PWD}@tcp(${HOST_IP}:13306)/${MYSQL_DATABASE}?charset=utf8mb4&parseTime=True
+      GormCkDsn: tcp://${HOST_IP}:19000?database=${CK_DATABASE}&password=${CK_PWD}&read_timeout=10&write_timeout=30
+      CookieKey: galaxyok0910
+      DbLogLevel: debug
+      LogLevel: debug
+      SvcNotifer: notifer:${notifer_grpc}
+    depends_on:
+      - notifer
+
+  notifer:
+    image: ${IMAGE_BASE}/notifer:1.1.0
+    restart: always
+    hostname: notifer
+    container_name: notifer
+    ports:
+      - ${notifer_http}:${notifer_http}
+      - ${notifer_grpc}:${notifer_grpc}
+    environment:
+      Name: notifer
+      HttpListen: :${notifer_http}
+      GrpcListen: :${notifer_grpc}
+      LimiterBurst: 4
+      LimiterRate: 4
+      LogLevel: error
+      WebhookDingding: 
+      WebhookFeishu: https://www.feishu.cn/flow/api/trigger-webhook/xxxxxxxxxxxxxxxxxx
+
+    
+  apigate:
+    container_name: apigate
+    hostname: apigate
+    image: ${IMAGE_BASE}/apigate:1.1.0
+    ports:
+      - ${apigate_http}:${apigate_http}
+      - ${apigate_grpc}:${apigate_grpc}
+    environment:
+      Name: apigate
+      Listen: :${apigate_http}
+      Install: ${INSTALL_SYSTEM}     
+      KafkaTopicTrackEvent: track_event
+      KafkaTopicTrackUserop: track_userop1,track_userop2
+      KafkaBrokers: ${HOST_IP}:19092
+      RedisAddr: ${HOST_IP}:16379
+      RedisPassword: ${DB_PWD}
+      UuidExpire: 1
+      LogLevel: debug
+      HttpDbsave: saver:${saver_http}
+      SvcDbsave: saver:${saver_grpc}
+      SvcOneuser: oneuser:${oneuser_grpc}
+      SvcConfigurator: configurator:${configurator_grpc}
+      HttpConfigurator: configurator:${configurator_http}
+      SvcIdnew: idnew:${idnew_grpc}
+      SvcPortal: portal:${portal_grpc}
+      HttpPortal: portal:${portal_http}
+      SvcReporter: reporter:${reporter_grpc}
+      HttpReporter: reporter:${reporter_http}
+      SvcNotifer: notifer:${notifer_grpc}
+      HttpNotifer: notifer:${notifer_http}
+    privileged: true
+    depends_on:
+      - oneuser
+      - saver
+      - idnew
+      - configurator
+      - reporter
+      - notifer
+
+  trackgate:
+    container_name: trackgate
+    hostname: trackgate
+    image: ${IMAGE_BASE}/trackgate:1.1.0
+    ports:
+      - ${trackgate_http}:${trackgate_http}
+    environment:
+      Name: trackgate
+      Listen: :${trackgate_http}
+      Ip2regionDb: ./data/ip2region.xdb
+      MaxMindDataPath: ./data/GeoLite2-City.mmdb
+      Install: ${INSTALL_SYSTEM}     
+      KafkaTopicTrackEvent: track_event
+      KafkaTopicTrackUserop: track_userop2
+      KafkaBrokers: ${HOST_IP}:19092
+      RedisAddr: ${HOST_IP}:16379
+      RedisPassword: ${DB_PWD}
+      UuidExpire: 1
+      LogLevel: info
+      SvcConfigurator: configurator:${configurator_grpc}
+      HttpConfigurator: configurator:${configurator_http}
+      SvcNotifer: notifer:${notifer_grpc}
+      SvcIdnew: idnew:${idnew_grpc}
+    privileged: true
