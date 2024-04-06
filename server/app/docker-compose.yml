@@ -1,6 +1,3 @@
-# 所有服务端口 从28080以上开始
-# 28080,25502 作为NGINX 外部代理商品
-# 25500 websocket是直接
 version: '2'
 services:
   syncuser:
