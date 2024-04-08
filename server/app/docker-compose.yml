@@ -62,7 +62,7 @@ services:
       LogLevel: info
       DbLogLevel: warn 
       EventSaveBatch: 10000
-      EventSaveInterval: 360
+      EventSaveInterval: 30
       DbType: mysql
       DbDsn: root:${DB_PWD}@tcp(${HOST_IP}:13306)/${MYSQL_DATABASE}?charset=utf8mb4&parseTime=True
       UserIntervalHigh: 300

@@ -13,13 +13,13 @@ services:
   
   clickhouse:
     container_name: clickhouse
-    image: clickhouse/clickhouse-server:22.9.6
+    image: clickhouse/clickhouse-server:24.3.2
     ports:
       - 18123:8123
       - 19000:9000
       - 19009:9009
     volumes:
-      - ${clickhouse_dir}/cktools:/cktools:rslave"
+      - ${clickhouse_dir}/cktools:/cktools"
       - ${clickhouse_dir}/ck_log:/var/log/clickhouse-server
       - ${clickhouse_dir}/ck_data:/var/lib/clickhouse
     ulimits:
