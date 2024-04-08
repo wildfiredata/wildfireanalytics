@@ -2,7 +2,8 @@
 
 ​	野火数据分析社区版本致力于为广大开发者提供免费的分析工具。该版本囊括了全面的模型分析功能,包括事件分析、漏斗分析、LTV分析、留存分析、分布分析、间隔分析、路径分析和属性分析等。除了强大的分析模型,它还支持用户分群、用户标签和用户详情查询等个性化功能。用户可以借助报表概览和组合报表功能,轻松掌握核心分析数据,深入洞察用户行为和营销表现。该版本的完善功能和免费特性,将为开发者们带来极大的分析支持和价值体验。
 
-
+  The community version of WildFireData analysis is dedicated to providing free analytical tools for developers. This version includes comprehensive model analysis capabilities, including event analysis, funnel analysis, Lifetime Value (LTV) analysis, retention analysis, distribution analysis, interval analysis, path analysis and attribute analysis. In addition to powerful analytical models, it also supports personalized features such as user segmentation, user tagging and user detail queries.
+  
 **报表概览**
 
 ![报表概览](https://v.png.pub/imgs/2024/04/02/d7fa6e810e99e820.png)
