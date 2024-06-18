@@ -8,7 +8,6 @@ services:
     environment:
       Name: syncuser
       Tables: users
-      Install: ${INSTALL_SYSTEM}
       UpdateTimeFields: update_time
       IdFields: user_id
       DbLogLevel: debug
@@ -56,7 +55,6 @@ services:
       HttpListen: :${saver_http}
       GrpcListen: :${saver_grpc}
       CkDebug: false
-      Install: ${INSTALL_SYSTEM}
       WorkerCacheExpire: 36000
       CounterInterval: 30
       LogLevel: info
@@ -161,7 +159,6 @@ services:
       Name: reporter
       HttpListen: :${reporter_http}
       GrpcListen: :${reporter_grpc}
-      Install: ${INSTALL_SYSTEM}      
       DbType: mysql
       DbDsn: root:${DB_PWD}@tcp(${HOST_IP}:13306)/${MYSQL_DATABASE}?charset=utf8mb4&parseTime=True
       GormCkDsn: tcp://${HOST_IP}:19000?database=${CK_DATABASE}&password=${CK_PWD}&read_timeout=10&write_timeout=30
@@ -201,7 +198,6 @@ services:
     environment:
       Name: apigate
       Listen: :${apigate_http}
-      Install: ${INSTALL_SYSTEM}     
       KafkaTopicTrackEvent: track_event
       KafkaTopicTrackUserop: track_userop1,track_userop2
       KafkaBrokers: ${HOST_IP}:19092
@@ -241,7 +237,6 @@ services:
       Listen: :${trackgate_http}
       Ip2regionDb: ./data/ip2region.xdb
       MaxMindDataPath: ./data/GeoLite2-City.mmdb
-      Install: ${INSTALL_SYSTEM}     
       KafkaTopicTrackEvent: track_event
       KafkaTopicTrackUserop: track_userop2
       KafkaBrokers: ${HOST_IP}:19092
