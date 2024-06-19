@@ -54,7 +54,7 @@ services:
     environment:
       HttpListen: :${saver_http}
       GrpcListen: :${saver_grpc}
-      CkDebug: false
+      #CkDebug: false
       WorkerCacheExpire: 36000
       CounterInterval: 30
       LogLevel: info
